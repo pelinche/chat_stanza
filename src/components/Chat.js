@@ -1,32 +1,27 @@
 import React, { useState } from 'react';
-
+import { Link, useHistory } from 'react-router-dom';
 const { client, xml } = require('@xmpp/client');
 const debug = require('@xmpp/debug');
 
-//let xmppStatus = "Xmpp status";
-//let logMessage = "";
-
-//var XMPP = require('stanza.io');
-let USERNAME = 'alberto';
 const DOMAIN = 'localhost';
 const PASSWORD = 'password';
 //const URL = 'https://localhost:5443/bosh/';
 const URL = 'ws://177.125.244.8:5280/websocket';
 //const URL = 'ws://127.0.0.1:5222/ws-xmpp';
 
+
 const Chat = () => {
-  //function Chat(){
-  //console.log('carregou componente Chat');
+  let USERNAME = localStorage.getItem('username');
+  console.log('carregou componente Chat');
+  console.log("Usuário:",USERNAME);
   const [count, setCount] = useState(1);
-  //  const [messageTo, setMessageTo] = useState('');
   const [xmppStatus, setXmppStatus] = useState('Not connected.');
-  const [userName, setUsername] = useState('alberto');
   const [xmpp, setXmpp] = useState(
     client({
       service: URL,
       domain: DOMAIN,
       resource: 'WebApp',
-      username: userName,
+      username: USERNAME,
       password: PASSWORD,
       transport: 'websocket',
     })
@@ -34,15 +29,17 @@ const Chat = () => {
   const [firstAcess, setFirstAcess] = useState(true);
   const [messageTo, setMessageTo] = useState('alberto');
   const [messageSend, setMessageSend] = useState('');
-  const [logMessage, setLogMessage] = useState('');
+  const [logMessage, setLogMessage] = useState('Start log');
   const [messages, setMessasges] = useState([]);
+  const history = useHistory();
+  console.log("Log Message Início: "+logMessage);
 
-  console.log(xmpp.status);
+  //console.log(xmpp.status);
 
   debug(xmpp, false);
 
   const send = () => {
-    //console.log(messageTo);
+    console.log(messageTo);
     //console.log(xmppConnection);
 
     const message = xml(
@@ -60,11 +57,18 @@ const Chat = () => {
   };
 
   const connect = () => {
-    if (xmpp.status !== 'online') {
-      //console.log(username);
-      //setXmppConnection(xmpp);
-      xmpp.start().catch(console.error);
-      //setXmppConnection(xmpp);
+    if(USERNAME){
+      if (xmpp.status !== 'online') {
+        //console.log(username);
+        //setXmppConnection(xmpp);
+        xmpp.start().catch(console.error);
+        //setXmppConnection(xmpp);
+      }else{
+        console.log('Já esta conectado');
+      }
+    }else{
+      //localStorage.removeItem('username');
+      history.push('/login');
     }
   };
 
@@ -75,10 +79,19 @@ const Chat = () => {
 
     xmpp.on('stanza', (stanza) => {
       if (stanza.is('message')) {
-        setLogMessage('' + stanza.getChild('body'));
-        //addLog("X");
-        console.log('logMessage: ', stanza);
-        console.log('Message Received: ' + stanza.getChild('body'));
+        //setMessasges([messages , stanza]);
+        console.log("Message from: "+stanza.attrs.from);
+        console.log("Message To: "+stanza.attrs.to);
+        //console.log("Message ? ",stanza.children.attrs[0]);
+
+
+        let msgreceived = '' + stanza.getChild('body');
+        setMessasges([messages , msgreceived]);
+        //console.log("msgreceived:",msgreceived);
+        addLog(msgreceived);
+
+        console.log('Received: ', stanza);
+        //console.log('Message Received: ' + stanza.getChild('body'));
       } else {
         //console.log('Other: ',stanza);
       }
@@ -89,21 +102,22 @@ const Chat = () => {
       xmpp.send(xml('presence'));
     });
 
-    /*    
+/*
     xmpp.on("offline", () => {
       console.log("offline");
-    });
+  });
 */
 
     xmpp.on('status', (status) => {
       console.debug('Status: ', status);
-      setXmppStatus(status + ' Username: ' + userName);
+      setXmppStatus(status + ' |  Username: ' + USERNAME);
     });
   };
 
   if (firstAcess) {
     setFirstAcess(false);
     xmppFunctions();
+    connect();
   }
 
   const disconnect = async () => {
@@ -112,15 +126,19 @@ const Chat = () => {
       //xmpp.close();
       await xmpp.stop();
       //await xmpp.disconnect();
-
+      localStorage.removeItem('username');
+      history.push('/login');
       console.log('desconectou');
     } else {
       console.log('No connection');
     }
   };
 
-  const addLog = (msg) => {
-    setLogMessage(logMessage + '<br />' + msg);
+  const addLog = async (msg) => {
+
+   await setLogMessage(`${logMessage} ${msg}`);
+   console.log('setou mensagem');
+    
   };
 
   const onChangeMessageTo = (e) => {
