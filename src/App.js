@@ -1,17 +1,11 @@
 import Chat from './components/Chat';
-import Teste1 from './components/Teste1';
+
 //import Chat3 from './components/Chat3';
 //import Chat2 from './components/Chat2';
 
 //import { BoshClient } from 'xmpp-bosh-client/browser';
 
-
-
-
-
 function App() {
-
-
   /*
   function  send(){
     const message = xml(
@@ -75,12 +69,6 @@ xmpp.on("online", (address) => {
   //setXmppStatus(xmpp.entity.status);
 });
 */
-
-
-
-
-
-
 
   return (
     <div className="App">
