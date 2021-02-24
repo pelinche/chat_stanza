@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 const { client, xml } = require('@xmpp/client');
 const debug = require('@xmpp/debug');
@@ -11,7 +11,7 @@ let USERNAME = 'alberto';
 const DOMAIN = 'localhost';
 const PASSWORD = 'password';
 //const URL = 'https://localhost:5443/bosh/';
-const URL = 'ws://127.0.0.1:5280/websocket';
+const URL = 'ws://177.125.244.8:5280/websocket';
 //const URL = 'ws://127.0.0.1:5222/ws-xmpp';
 
 const Chat = () => {
