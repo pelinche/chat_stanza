@@ -1,37 +1,36 @@
-import React, { useState } from 'react';
-import { useHistory } from "react-router-dom";
+import React, { useEffect, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 
-
-function Login(){
+function Login() {
   const history = useHistory();
-  const [userName, setUserName]=useState('');
-
+  const [userName, setUserName] = useState('');
+  const [logMessage, setLogMessage] = useState('');
 
   const login = (e) => {
     e.preventDefault();
-    console.log("Auth user: "+userName);
-    if(userName !== ''){
+    console.log('xAuth user: ' + userName);
+    if (userName !== '') {
       localStorage.setItem('username', userName);
       history.push('/chat');
     }
-  }
+  };
 
-  const connect = () =>{
+  const connect = () => {};
 
-  }
-
-  const onChangeUsername = (e) =>{
+  const onChangeUsername = (e) => {
     e.preventDefault();
     e.persist();
     setUserName(e.target.value);
+  };
 
-  }
+  const addLog = async (msg) => {
+    await setLogMessage(`${logMessage} ${msg}`);
+    console.log('setou mensagem');
+  };
 
-
-  return(
+  return (
     <>
       <form onSubmit={login}>
-
         <label>Username:</label>
         <input
           onChange={onChangeUsername}
@@ -45,16 +44,18 @@ function Login(){
           }}
         >
           Connect
-      </button>
+        </button>
+        <button
+          onClick={() => {
+            setLogMessage(logMessage + 'X');
+          }}
+        >
+          addLog
+        </button>
+        <p>{logMessage}</p>
       </form>
-
     </>
-
   );
-
-
 }
-
-
 
 export default Login;

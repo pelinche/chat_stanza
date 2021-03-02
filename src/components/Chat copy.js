@@ -9,23 +9,13 @@ const PASSWORD = 'password';
 const URL = 'ws://177.125.244.8:5280/websocket';
 //const URL = 'ws://127.0.0.1:5222/ws-xmpp';
 
-let USERNAME = localStorage.getItem('username');
-const xmpp = client({
-  service: URL,
-  domain: DOMAIN,
-  resource: 'WebApp',
-  username: USERNAME,
-  password: PASSWORD,
-  transport: 'websocket',
-});
-const messages = ['Valor 1', 'Valor 2', 'Valor3'];
-
 const Chat = () => {
+  let USERNAME = localStorage.getItem('username');
   console.log('Load component Chat');
   console.log('Username:', USERNAME);
   const [count, setCount] = useState(1);
   const [xmppStatus, setXmppStatus] = useState('Not connected.');
-  /*const [xmpp, setXmpp] = useState(
+  const [xmpp, setXmpp] = useState(
     client({
       service: URL,
       domain: DOMAIN,
@@ -34,12 +24,12 @@ const Chat = () => {
       password: PASSWORD,
       transport: 'websocket',
     })
-  );*/
+  );
   const [firstAcess, setFirstAcess] = useState(true);
-  const [messageTo, setMessageTo] = useState('luis');
+  const [messageTo, setMessageTo] = useState('alberto');
   const [messageSend, setMessageSend] = useState('');
   const [logMessage, setLogMessage] = useState('Start log');
-  //  const [messages, setMessasges] = useState([]);
+  const [messages, setMessasges] = useState([]);
   const history = useHistory();
   console.log('Log Message: ' + logMessage);
 
@@ -60,8 +50,6 @@ const Chat = () => {
     if (xmpp.status === 'online') {
       setCount(count + 1);
       xmpp.send(message);
-      //setLogMessage(`${logMessage} ${message}`);
-      //setMessasges([messages, 'xxxs']);
     } else {
       console.log('Offline');
     }
@@ -73,9 +61,7 @@ const Chat = () => {
         //console.log(username);
         //setXmppConnection(xmpp);
         xmpp.start().catch((error) => {
-          console.log('*Erro', error);
-          localStorage.removeItem('username');
-          history.push('/login');
+          console.log('Error', error);
         });
 
         //setXmppConnection(xmpp);
@@ -93,7 +79,7 @@ const Chat = () => {
       console.error('Error:', err);
       // xmpp.close();
       //xmpp.stop();
-      setFirstAcess(false);
+      setFirstAcess(true);
       //xmpp.;
       disconnect();
     });
@@ -106,7 +92,7 @@ const Chat = () => {
         //console.log("Message ? ",stanza.children.attrs[0]);
 
         let msgreceived = '' + stanza.getChild('body');
-        //        setMessasges([messages, msgreceived]);
+        setMessasges([messages, msgreceived]);
         //console.log("msgreceived:",msgreceived);
         addLog(msgreceived);
 
@@ -125,8 +111,8 @@ const Chat = () => {
     /*
     xmpp.on("offline", () => {
       console.log("offline");
-    });
-    */
+  });
+*/
 
     xmpp.on('status', (status) => {
       console.debug('Status: ', status);
@@ -135,7 +121,6 @@ const Chat = () => {
   };
 
   if (firstAcess) {
-    console.log('Starting listen ');
     setFirstAcess(false);
     xmppFunctions();
     connect();
@@ -149,16 +134,15 @@ const Chat = () => {
       //await xmpp.disconnect();
       localStorage.removeItem('username');
       history.push('/login');
+      console.log('desconectou');
     } else {
       console.log('No connection');
     }
   };
 
-  const addLog = (msg) => {
-    console.log('Last Message:', logMessage);
-    console.log('Message:', msg);
-    setLogMessage(`${logMessage} ${msg}`);
-    //console.log('setou mensagem');
+  const addLog = async (msg) => {
+    await setLogMessage(`${logMessage} ${msg}`);
+    console.log('setou mensagem');
   };
 
   const onChangeMessageTo = (e) => {
